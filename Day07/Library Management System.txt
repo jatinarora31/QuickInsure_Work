@@ -1,0 +1,69 @@
+** Library Management System **
+
+DATABASE TABLES:
+
+1) User -
+user_id(PK), 
+name varchar(100),
+email varchar(100),
+phone varchar(15),
+address text
+created_at(Date)
+updated_at(Date)
+
+2) Book -
+book_id int(PK),
+title varchar(200),'
+isbn varchar(20),
+edition varchar(20),
+publisher_id int (FK),
+category_id int (FK),
+total_copies int,
+available_copies int
+
+3) Author -
+author_id int (PK),
+author_name varchar(100),
+nationality varchar(50),
+birth_year int
+
+4) BookAuthor - 
+book_author_id int (PK),
+book_id int (FK),
+author_id int (FK)
+
+5) Publisher - 
+publisher_id int (PK),
+publisher_name varchar(100),
+publisher_email varchar(100),
+publisher_address text
+
+6) Category -
+category_id int (PK),
+category_name varchar(100),
+description text
+
+7) BookIssue -
+issue_id int (PK),
+book_id int (FK),
+member_id int (FK),
+issue_date Date, due_date Date
+
+8) BookReturn -
+return_id int (PK),
+issue_id int (FK),
+return_date Date
+
+9) Reservation -
+reservation_id int (PK),
+book_id int(FK),
+member_id int (FK),
+reservation_date Date,
+status varchar(20)
+
+10) Fine -
+fine_id int (PK),
+member_id int (FK),
+issue_id int (FK),
+amount decimal,
+paid_status varchar(20)
