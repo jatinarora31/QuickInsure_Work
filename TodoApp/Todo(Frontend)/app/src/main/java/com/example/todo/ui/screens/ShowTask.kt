@@ -125,29 +125,14 @@ fun ShowTask(navController: NavController, viewModel: TodoViewModel, todoId: Int
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color(0xFF555555)
                         )
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End
-                        ) {
-                            Card(
-                                shape = RoundedCornerShape(50),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = if (it.isCompleted)
-                                        Color(0xFF0072ae) else Color(0xFF0072AE)
-                                )
-                            ) {
-                                Text(
-                                    text = if (it.isCompleted) "Completed" else "Pending",
-                                    modifier = Modifier.padding(
-                                        horizontal = 16.dp,
-                                        vertical = 8.dp
-                                    ),
-                                    color = Color.White,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            }
-                        }
+                        Text(
+                            text = if (it.isCompleted) "Completed" else "Pending...",
+                            modifier = Modifier.padding(
+                                top = 15.dp
+                            ),
+                            color = Color(0xFF0072AE),
+                            fontWeight = FontWeight.SemiBold
+                        )
                     }
                 }
             }

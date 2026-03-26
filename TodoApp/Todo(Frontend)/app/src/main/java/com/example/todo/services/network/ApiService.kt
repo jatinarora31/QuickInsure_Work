@@ -22,7 +22,8 @@ interface ApiService {
     @PATCH("/todos/{id}/update_status")
     suspend fun updateStatus(@Path("id") id: Int, @Body request: UpdateStatusTododRequest) : Response<Todo>
 
-    @PUT("/todos")
+    @PUT("/todos/{id}")
     suspend fun updateTodo(@Path("id") id: Int, @Body createTodoRequest: CreateTodoRequest) : Response<Todo>
+
 
 }

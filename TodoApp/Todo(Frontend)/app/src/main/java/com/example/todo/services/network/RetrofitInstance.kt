@@ -9,8 +9,9 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitInstance {
 
-    private val BASE_URL = "http://192.168.0.105:3000"
+    private val BASE_URL = "http://172.30.1.49:3000"
     // 172.30.1.49
+    //192.168.0.105
     val api: ApiService by lazy {
 
         val httpBuilder = OkHttpClient.Builder()

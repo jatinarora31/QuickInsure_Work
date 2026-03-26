@@ -50,7 +50,7 @@ class TodoViewModel : ViewModel() {
             isLoading = true
             val result = repository.createTodo(CreateTodoRequest(title,description))
             result.onSuccess {
-                    todo -> todos.add(0,todo)
+                    todo ->
                 fetchTodos()
                 onSuccess()
             }
@@ -75,6 +75,26 @@ class TodoViewModel : ViewModel() {
                 }
                 todosError = it.message
             }
+        }
+    }
+
+    fun updateTodo(todo : Todo) {
+        viewModelScope.launch {
+            isLoading = true
+            val result = repository.updateTodo(todo)
+            result.onSuccess {updatedTodo ->
+
+                val index = todos.indexOfFirst { it.id == updatedTodo.id }
+
+                if (index != -1) {
+                    todos[index] = updatedTodo
+                }
+
+            }
+            result.onFailure {
+                todosError = it.message
+            }
+            isLoading = false
         }
     }
 

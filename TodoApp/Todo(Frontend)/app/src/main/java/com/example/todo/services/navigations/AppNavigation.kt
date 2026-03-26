@@ -37,6 +37,7 @@ import com.example.todo.ui.screens.Screens
 import com.example.todo.ui.screens.ShowTask
 import com.example.todo.ui.screens.TodoScreen
 import com.example.todo.viewmodels.TodoViewModel
+import kotlinx.coroutines.flow.callbackFlow
 
 @Composable
 fun AppNavigation() {
@@ -50,7 +51,11 @@ fun AppNavigation() {
         composable(route = Screens.Splash.route) { SplashScreen(navController) }
 
         composable(Screens.TodoList.route) { TodoScreen(navController,viewModel) }
-        composable(Screens.AddTodo.route) { AddTodoScreen(navController,viewModel) }
+        composable(Screens.AddTodo.route,
+            arguments = listOf(navArgument("todoId") { type = NavType.IntType; defaultValue = -1 } )
+            ) {
+            backStackEntry -> val todoId = backStackEntry.arguments?.getInt("todoId") ?: -1
+            AddTodoScreen(navController = navController,viewModel = viewModel, todoId = todoId) }
         composable(Screens.CompletedTodo.route) { CompletedTasks(navController,viewModel) }
         composable(route = Screens.ShowTask.route,
             arguments = listOf(navArgument("id") { type = NavType.IntType })) { backStackEntry ->
@@ -91,7 +96,7 @@ fun SplashScreen(navController: NavHostController) {
             modifier = Modifier.scale(scale).alpha(alpha)) {
 
             Image(
-                painter = painterResource(id = R.drawable.list),
+                painter = painterResource(id = R.drawable.list2),
                 contentDescription = "App Logo",
                 modifier = Modifier.size(120.dp)
             )

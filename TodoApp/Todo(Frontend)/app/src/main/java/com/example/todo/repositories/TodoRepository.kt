@@ -51,4 +51,9 @@ class TodoRepository {
         return handleApiCall ( apiCall = suspend { RetrofitInstance.api.updateStatus(id,UpdateStatusTododRequest(status)) })
     }
 
+    suspend fun updateTodo(todo: Todo) :Result<Todo> {
+        return handleApiCall ( apiCall = suspend { RetrofitInstance.api.updateTodo(todo.id,
+            CreateTodoRequest(todo.title,todo.description)) } )
+    }
+
 }

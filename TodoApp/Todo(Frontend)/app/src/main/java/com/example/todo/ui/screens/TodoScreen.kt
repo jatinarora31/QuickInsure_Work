@@ -1,9 +1,12 @@
 package com.example.todo.ui.screens
 
+import com.example.todo.R
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -46,17 +49,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.todo.models.Todo
 import com.example.todo.viewmodels.TodoViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -81,6 +82,16 @@ fun TodoScreen(navController: NavController, viewModel: TodoViewModel) {
                     savedStateHandle.remove<Boolean>("todo_added")
                 }
             }
+
+        savedStateHandle?.getLiveData<Boolean>("todo_updated")
+            ?.observeForever { isUpdated ->
+                if (isUpdated == true) {
+                    coroutineScope.launch {
+                        snackBarHostState.showSnackbar("Todo Updated Successfully ✏️")
+                    }
+                    savedStateHandle.remove<Boolean>("todo_updated")
+                }
+            }
     }
 
 
@@ -92,7 +103,7 @@ fun TodoScreen(navController: NavController, viewModel: TodoViewModel) {
             TopAppBar(
                 navigationIcon = {
                     Icon(
-                        imageVector = Icons.Default.CheckCircle,
+                        painter = painterResource(id = R.drawable.list2),
                         contentDescription = "Todo",
                         modifier = Modifier.padding(start = 12.dp).size(45.dp),
                         tint = Color.White
@@ -122,8 +133,6 @@ fun TodoScreen(navController: NavController, viewModel: TodoViewModel) {
                             onClick = { navController.navigate(Screens.CompletedTodo.route) } )
                     }
                 },
-
-
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFF0072ae),
                     titleContentColor = Color.White,
@@ -132,7 +141,9 @@ fun TodoScreen(navController: NavController, viewModel: TodoViewModel) {
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {navController.navigate("add_todo")}) {
+            FloatingActionButton(onClick = {navController.navigate(Screens.AddTodo.upsertTodo(-1))},
+                containerColor = Color(0xFF0072AE),
+                contentColor = Color.White) {
                 Icon(imageVector = Icons.Default.AddCircle,
                     contentDescription = "Add Todo",
                     modifier = Modifier.size(35.dp))
@@ -141,18 +152,17 @@ fun TodoScreen(navController: NavController, viewModel: TodoViewModel) {
     ) { innerPadding ->
         Column(modifier = Modifier
             .fillMaxSize()
-            .padding(innerPadding)) {
-            Text(
-                text = "You have ${todos.size} tasks",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.DarkGray
-            )
+            .padding(top = innerPadding.calculateTopPadding(),
+                start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                end = innerPadding.calculateEndPadding(LayoutDirection.Ltr),
+                )) {
             LazyColumn(modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                contentPadding = PaddingValues(
+                    start = 12.dp,
+                    end = 12.dp,
+                    top = 8.dp,
+                    bottom = 8.dp + innerPadding.calculateBottomPadding()
+                )
             ) {
                 item { Spacer(modifier = Modifier.height(2.dp)) }
                 items(todos) { todo -> TodoItem(todo = todo, onCheckedChange = { isChecked -> viewModel.updateTodoStatus(todo,isChecked)
@@ -160,7 +170,8 @@ fun TodoScreen(navController: NavController, viewModel: TodoViewModel) {
                         coroutineScope.launch {
                             snackBarHostState.showSnackbar("Task Completed")
                         }
-                }, onInfoClick = { navController.navigate(Screens.ShowTask.createRoute(todo.id))})}
+                }, onInfoClick = { navController.navigate(Screens.ShowTask.createRoute(todo.id))},
+                    onEditClick = { navController.navigate(Screens.AddTodo.upsertTodo(todo.id)) } )}
             }
         }
 
@@ -169,12 +180,13 @@ fun TodoScreen(navController: NavController, viewModel: TodoViewModel) {
 }
 
 @Composable
-fun TodoItem(todo: Todo, onCheckedChange: (Boolean) -> Unit, onInfoClick: () -> Unit) {
+fun TodoItem(todo: Todo, onCheckedChange: (Boolean) -> Unit, onInfoClick: () -> Unit, onEditClick: () -> Unit) {
 
     Card(modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFececec)
+            containerColor = Color(0xFFECECEC)
+            // 0xFFececec
         )
 
     ) {
@@ -199,7 +211,7 @@ fun TodoItem(todo: Todo, onCheckedChange: (Boolean) -> Unit, onInfoClick: () -> 
             }
 
             if(!todo.isCompleted) {
-                IconButton(onClick = {} ) {
+                IconButton(onClick = { onEditClick() } ) {
                     Icon(
                         imageVector = Icons.Default.Edit,
                         contentDescription = "EDIT",

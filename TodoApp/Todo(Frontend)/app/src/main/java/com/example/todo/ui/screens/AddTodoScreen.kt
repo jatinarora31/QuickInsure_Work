@@ -38,15 +38,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.todo.models.Todo
 import com.example.todo.viewmodels.TodoViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddTodoScreen(navController: NavController, viewModel: TodoViewModel) {
+fun AddTodoScreen(navController: NavController, viewModel: TodoViewModel,todoId: Int) {
 
-    var title by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
+    val existingTodo = viewModel.todos.find { it.id == todoId }
+
+    var title by remember { mutableStateOf(existingTodo?.title ?: "") }
+    var description by remember { mutableStateOf(existingTodo?.description ?: "") }
     val snackBarHostState = remember { SnackbarHostState() }
 
     Scaffold(
@@ -58,11 +61,8 @@ fun AddTodoScreen(navController: NavController, viewModel: TodoViewModel) {
                 title = {
                     Text(
                         "Add Todo",
-                        modifier = Modifier.padding(start=13.dp),
-                        style = MaterialTheme.typography.headlineMedium,
+//                        modifier = Modifier.padding(start=13.dp),
                         color = Color.White,
-                        fontFamily = FontFamily.Serif,
-                        fontSize = 27.sp,
                         fontWeight = FontWeight.Bold
                     )
                 },
@@ -124,20 +124,40 @@ fun AddTodoScreen(navController: NavController, viewModel: TodoViewModel) {
 
             Button(
                 onClick = {
-                    if(title.isNotBlank() && description.isNotBlank()) {
-                      viewModel.addTodo(title,description) { navController.previousBackStackEntry
-                          ?.savedStateHandle
-                          ?.set("todo_added", true)
-                          navController.popBackStack() }
-                    } },
-                modifier = Modifier.fillMaxWidth().height(55.dp),
+                    if (title.isNotBlank() && description.isNotBlank()) {
+                        if (todoId == -1) {
+                            viewModel.addTodo(title, description) {
+                                navController.previousBackStackEntry
+                                    ?.savedStateHandle
+                                    ?.set("todo_added", true)
+                                navController.popBackStack()
+                            }
+                        } else {
+                            existingTodo?.let {
+                                viewModel.updateTodo(
+                                    it.copy(
+                                        title = title,
+                                        description = description
+                                    )
+                                )
+                            }
+                            navController.previousBackStackEntry
+                                ?.savedStateHandle
+                                ?.set("todo_updated", true)
+                            navController.popBackStack()
+                        }
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(55.dp),
                 shape = RoundedCornerShape(14.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF0072AE)
-                ))
-            {
+                )
+            ) {
                 if (viewModel.isLoading) Text("Saving...")
-                else Text("Save Todo")
+                else Text(if (todoId == -1) "Save Todo" else "Update Todo")
             }
 
         }

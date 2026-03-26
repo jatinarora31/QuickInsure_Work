@@ -46,10 +46,9 @@ fun CompletedTasks(navController: NavController, viewModel: TodoViewModel) {
     ) { innerPadding ->
         LazyColumn(modifier = Modifier.fillMaxSize().padding(innerPadding), contentPadding = PaddingValues(12.dp)) {
             items(completedTodos) { todo ->
-                TodoItem(todo = todo, onCheckedChange = {
-                    isChecked -> viewModel.updateTodoStatus(todo, isChecked)
-                }) {
-
+                TodoItem(todo = todo,
+                    onCheckedChange = { isChecked -> viewModel.updateTodoStatus(todo, isChecked) },
+                    onInfoClick = {}) {
                 }
             }
         }
