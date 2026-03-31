@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  admission_no: 1
+  rollno: 1
+  name: MyString
+  standard: 1
+  dob: 2026-03-30
+  mark: one
+
+two:
+  admission_no: 1
+  rollno: 1
+  name: MyString
+  standard: 1
+  dob: 2026-03-30
+  mark: two
